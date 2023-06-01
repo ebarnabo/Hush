@@ -1,1 +1,2 @@
 # Hush
+The "Hush" messaging app project was developed for a Human-Computer Interaction (HCI) course as part of the MIAGE Master's program. This project used a combination of technologies, including the https://trankillprojets.fr/wal/ API, Vue.js for user interface development, Scss for enhanced CSS styling, ViteJs as a lightweight and speedy development tool, Bootstrap as the user interface framework, and Figma for prototype design.
