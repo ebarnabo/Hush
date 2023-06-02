@@ -45,6 +45,8 @@
       updateMode() {
         if (this.mode === 'dark') {
           // styles du mode sombre
+          // Ajouter une classe CSS globale pour le thème sombre de Sweet Alert
+          document.documentElement.classList.add('sweetalert-dark-theme');
           document.body.classList.add('dark-mode');
         } else {
           // styles du mode clair(dans le fichier scss)

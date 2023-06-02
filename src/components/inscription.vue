@@ -1,7 +1,6 @@
-
 <template>
-<div class="container mt-3 inactive vues animate__animated " id="inscription">
-    <form>
+  <div class="container mt-3 inactive vues animate__animated " id="inscription">
+    <form @submit="inscription">
       <h2 class="text-center">Inscription</h2>  
       <div class="container-fluid">
         <div class="row">
@@ -28,7 +27,7 @@
         <button type="submit" class="btn btn-primary btn-block text-center mb-5 mx-3 login-with-google-btn" title="Connexion" onclick="Connexion()">S'inscrire avec Google</button>
       </div>
       <div class="d-flex justify-content-center">
-        <button type="submit" class="btn btn-primary btn-block text-center mb-5" title="Inscription" >Inscription</button>
+        <button type="submit" class="btn btn-primary btn-block text-center mb-5" title="Inscription">Inscription</button>
       </div>
       <p class="text-center">Déjà inscrit <router-link to="/login"> Connexion </router-link></p>
     </form>
@@ -37,10 +36,51 @@
 </template>
 
 <script>
+export default {
+  methods: {
+    inscription(event) {
+      event.preventDefault();
 
+      // Récupérer les valeurs des champs pseudo et email du formulaire
+      var pseudo = document.getElementById('pseudo').value;
+      var email = document.getElementById('email').value;
+
+      // Construire l'URL d'inscription avec les paramètres
+      var url = 'https://trankillprojets.fr/wal/wal.php?inscription&identite=' + encodeURIComponent(pseudo) + '&mail=' + encodeURIComponent(email);
+
+      // Effectuer la requête HTTP GET
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          // Vérifier la réponse de l'API
+          if (data.etat.reponse === 1) {
+            // Afficher le message de succès
+            //alert(data.etat.message);
+            Swal.fire(
+              'En attente de validation',
+              'Merci de vous être inscrit à notre service de chat ! Pour activer votre compte, veuillez cliquer sur le lien dans vos mails',
+              'info'
+            )
+          } else {
+            // Afficher le message d'erreur
+            //alert('Erreur: ' + data.etat.message);
+            Swal.fire(
+              'Il y a une erreur',
+              'Erreur: Vous êtes déjà inscrit sur HUSH. Un mail a été envoyé sur votre boite mail.',
+              'error'
+            )
+          }
+        })
+        .catch(error => {
+          console.error('Erreur:', error);
+          // Afficher le message d'erreur
+          console.log('Une erreur s\'est produite lors de l\'inscription.');
+        });
+    }
+  }
+}
 </script>
 
 <style scoped lang="scss">
+/* Vos styles CSS ici */
 </style>
-
-
