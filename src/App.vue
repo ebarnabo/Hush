@@ -1,5 +1,5 @@
 <template>
-    <!-- Le reste du contenu de app.vue -->
+    <RouterView></RouterView>
 </template>
 
 <script setup>

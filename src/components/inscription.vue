@@ -28,20 +28,19 @@
         <button type="submit" class="btn btn-primary btn-block text-center mb-5 mx-3 login-with-google-btn" title="Connexion" onclick="Connexion()">S'inscrire avec Google</button>
       </div>
       <div class="d-flex justify-content-center">
-        <button type="submit" class="btn btn-primary btn-block text-center mb-5" title="Inscription" onclick="Inscription()">Inscription</button>
+        <button type="submit" class="btn btn-primary btn-block text-center mb-5" title="Inscription" >Inscription</button>
       </div>
-      <p class="text-center">Déjà inscrit <a class="links" href="/login" title="Connexion">Connexion</a></p>
-
+      <p class="text-center">Déjà inscrit <router-link to="/login"> Connexion </router-link></p>
     </form>
   </div>
+  <ToggleButton />
 </template>
 
-<script setup>
+<script>
+
 </script>
 
 <style scoped lang="scss">
 </style>
 
-export default {
-  // Composant inscription.vue
-}
+
