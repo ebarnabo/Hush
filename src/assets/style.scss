@@ -1,5 +1,5 @@
 
-$accentColor : #4E3296 ;
+$accentColor : #4E3296;
 $bgDark : #222222 ;
 $bgWhite : #D5D5D5;
 
@@ -50,6 +50,22 @@ a:hover{
     border-color: $accentColor !important;
     opacity: 0.8;
   }
+
+html{
+  outline: none; 
+}
+
+input:focus {
+  outline: none; 
+  // border-color:  #4E3296; 
+}
+
+
+input:active {
+  outline: none; 
+  // border-color :#4E3296; 
+}
+
   
   .login-with-google-btn,
   .login-with-apple-btn {
@@ -127,4 +143,28 @@ a:hover{
     50% {
       transform: translateX(0);
     }
+  }
+
+  .dark-mode {
+    /* Style mode sombre */
+    background-color: #222222 !important;
+    color: white;
+  }
+  .dark-mode h1,.dark-mode h2, .dark-mode h3 {
+  color: white !important;
+}
+  
+.dark-mode p {
+  color: white !important;
+}
+  
+  .dark-mode .form-control {
+    /* Style mode sombre .form-control */
+    background-color: #333333;
+    color: white;
+    border-color: #777777;
+  }
+
+  .dark-mode .swal2-html-container{
+    color: white;
   }

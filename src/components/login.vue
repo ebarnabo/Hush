@@ -35,13 +35,12 @@ export default {
     connexion(event) {
       event.preventDefault();
 
-      // Récupérer la valeur du champ identifiant du formulaire
+      // Récupérer la valeur de l'identifiant dans le formulaire
       var identifiant = document.getElementById('identifiant').value;
 
-      // Construire l'URL pour obtenir les paramètres avec l'identifiant
+      // URL pour obtenir les paramètres avec l'identifiant
       var url = 'https://trankillprojets.fr/wal/wal.php?information&identifiant=' + encodeURIComponent(identifiant);
 
-      // Effectuer la requête HTTP GET
       fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -52,7 +51,7 @@ export default {
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
-            timer: 3000,
+            timer: 1500,
             timerProgressBar: true,
             didOpen: (toast) => {
               toast.addEventListener('mouseenter', Swal.stopTimer)
@@ -60,6 +59,7 @@ export default {
             }
           })
 
+          this.$router.push('/chat');
           Toast.fire({
             icon: 'success',
             title: 'Connexion réussie !'
@@ -83,6 +83,8 @@ export default {
     }
   }
 }
+
+
 </script>
 
 <style scoped>

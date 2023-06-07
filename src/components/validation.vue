@@ -5,12 +5,12 @@
         <div class="row">
           <div class="col">
             <img src="src/assets/hush.png" class="mx-auto d-block mb-5" alt="Responsive image" height="auto" width="200px">
-            <img src="img/waiting.gif" class="mx-auto d-block mb-5" alt="waiting" height="auto" width="600px">
+            <img src="../assets/waiting.gif" class="mx-auto d-block mb-5" alt="waiting" height="auto" width="600px">
           </div>
         </div>
       </div>
   </div> 
-
+  <ToggleButton />
 </template>
 
 <script>
