@@ -10,6 +10,7 @@
   "dependencies": {
     "@sweetalert2/theme-dark": "^5.0.15",
     "animate.css": "^4.1.1",
+    "moment": "^2.29.4",
     "sweetalert2": "^11.4.8",
     "vue": "^3.3.2",
     "vue-advanced-chat": "^2.0.7",

@@ -7,7 +7,7 @@
         <h2 class="user-name"><span class="i-circle">U</span>  {{ selectedConversation.user }}</h2>
         <button class="action-button" @click="deleteRelation()"><i class="fa-solid fa-trash circle-icon" style="color: white;"></i></button>
       </div>
-      <div class="chat-body">
+      <div class="chat-body" ref="chatBody">
         <div v-for="(message, index) in selectedConversation.messages" :key="index">
           <div class="message-bubble" :class="{'sender-message': message.sender !== 'Utilisateur 1', 'receiver-message': message.sender === 'Utilisateur 1'}">
             {{ message.content }}
@@ -32,12 +32,14 @@
       </div>
       <ul class="conversation-list scrollable-list">
         <li v-for="(conversation, index) in conversations" :key="index" @click="selectConversation(conversation)">
-          {{ conversation.user }}
+          <h4><span class="i-circle">U</span> {{ conversation.user }}</h4>
+          <p class="msg-preview">{{ previewMessage(conversation) }}</p>
+          <span class="timestamp">{{ formatTimestamp(conversation) }}</span> <i class="fa-solid fa-angle-right"></i>
         </li>
       </ul>
       <div class="conversation-footer">
         <button @click="addRelation"><i class="fa-solid fa-user-plus" style="color: #ffffff;"></i></button>
-        <button ><i class="fa-solid fa-gear" style="color: #ffffff;"></i></button>
+        <button @click="settings()" ><i class="fa-solid fa-gear" style="color: #ffffff;"></i></button>
       </div>
     </div>
   </div>
@@ -49,7 +51,7 @@ export default {
   data() {
     return {
       conversations: [
-        { user: "Utilisateur 1", messages: [] },
+        { user: "Utilisateur 1", messages: [],},
         { user: "Utilisateur 2", messages: [] },
         { user: "Utilisateur 2", messages: [] },
         { user: "Utilisateur 2", messages: [] },
@@ -77,40 +79,49 @@ export default {
     };
   },
   methods: { 
+    // Fonction pour ouvrir une conversation
     selectConversation(conversation) {
       this.selectedConversation = conversation;
     },
+    // retour à la liste des convs
     goBack() {
       this.selectedConversation = null;
     },
     sendMessage() {
-      if (this.message.trim() !== "") {
-        this.selectedConversation.messages.push({
-          content: this.message.trim(),
-          sender: 'Utilisateur 1', // Mettez ici le nom de l'émetteur actuel
-        });
-        this.message = "";
+  if (this.message.trim() !== "") {
+    this.selectedConversation.messages.push({
+      content: this.message.trim(),
+      sender: 'Utilisateur 1',
+      timestamp: new Date().toISOString(), // Ceci est la nouvelle ligne
+    });
+    this.message = "";
 
-        this.$nextTick(() => {
-          this.scrollToBottom();
-        });
-      }
+    this.$nextTick(() => {
+      this.scrollToBottom();
+    });
+  }
+  this.scrollToBottom();
     },
+
+    //Ajouter un emoji
     addEmoji(emoji) {
       this.message += emoji;
     },
+
+    // Fonction pour descendre dans la zone de chat, quand un message écrit
     scrollToBottom() {
       const chatBody = this.$refs.chatBody;
       chatBody.scrollTop = chatBody.scrollHeight;
     },
     
     async addRelation(){
-      const { value: formValues } = await Swal.fire({
+      const { value: formValues } = Swal.fire({
   title: 'Ajouter une nouvelle relation',
   html:
     '<input type="text" id="swal-input1" class="swal2-input" placeholder="identifiant">' +
     
     '<input type="mail" id="swal-input2" class="swal2-input" placeholder="email" required>',
+  
   focusConfirm: false,
   preConfirm: () => {
     return [
@@ -146,7 +157,60 @@ if (formValues) {
         this.goBack()
       }
     })
+    },
+    settings(){
+      Swal.fire({
+  title: '<strong>Options</u></strong>',
+  html:
+      '<h5>Choix du thème du système</h5>'+
+      '<input type="radio" id="lighttheme" name="contact" value="Clair " />'+
+      '<label id="lightthemes" for="lighttheme"> Clair </label>'+
+
+      '<input type="radio" @click="toggleMode id="darktheme" name="contact" value="Thème sombre " />'+
+      '<label id="darkthemes"for="darktheme"> Sombre </label>',
+  //showCloseButton: true,
+  showCancelButton: true,
+  focusConfirm: false,
+  confirmButtonText:
+    '<i class="fa fa-thumbs-up"></i> Confirmer',
+  confirmButtonAriaLabel: 'Confirmer',
+  cancelButtonText:
+    '<i class="fa fa-thumbs-down"></i>Annuler',
+  cancelButtonAriaLabel: 'Annuler'
+})
+    },
+    previewMessage(conversation) {
+    if (conversation.messages.length > 0) {
+      let lastMessage = conversation.messages[conversation.messages.length - 1];
+      return lastMessage.content.length > 50 ? 
+        lastMessage.content.substring(0, 48) + '...' : 
+        lastMessage.content;
     }
+    return "";
+    },
+    formatTimestamp(conversation) {
+    if (conversation.messages.length > 0) {
+      let lastMessage = conversation.messages[conversation.messages.length - 1];
+      let timestamp = new Date(lastMessage.timestamp);
+      let now = new Date();
+      let diff = now - timestamp;
+
+      // Si le message date de moins de 24 heures, affiche l'heure
+      if (diff < 24 * 60 * 60 * 1000) {
+        let hours = timestamp.getHours();
+        let minutes = timestamp.getMinutes();
+
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        return `${hours}:${minutes}`;
+      }
+      // Sinon, affichez la date
+      else {
+        return timestamp.toLocaleDateString();
+      }
+  }
+  return "";
+    },
+
   },
 };
 </script>
@@ -160,15 +224,35 @@ input{
   outline: none; 
   border: none;
 }
+.timestamp {
+  margin-top: -50px;
+  padding-right: 20px;
+  float: right;
+}
+.fa-angle-right{
+  float: right;
+  margin-top: -45px;
+  margin-left: 55px;
+}
 
 #header-list-img{
   height: 50px;
   margin-top: 1%;
 }
 
+
+.conversation-list li{
+  transition: opacity, 0.5s;
+}
+.conversation-list li:hover {
+  opacity: 0.5;
+  cursor: pointer;
+
+}
+
 .i-circle {
     display: inline-block;
-    background-color: $bgDark;
+    background-color: #9DA3AF;
     color: #fff;
     border-radius: 50%;
     font-size: 22px;
@@ -235,6 +319,10 @@ input{
   height: 80vh;
   scroll-behavior: smooth;
 }
+.msg-preview{
+  font-size: 0.8em;
+  color: #333333 !important;
+}
 
 .message-bubble {
   display: inline-block;
@@ -252,7 +340,7 @@ input{
 }
 
 .receiver-message {
-  background-color: #333333;
+  background-color: #3B3B3D;
   border: $bgDark;
   color: #fff;
   align-self: flex-end;
@@ -299,7 +387,7 @@ input{
 
 .conversation-list li {
   padding: 20px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 0.5px solid #ddd;
   cursor: pointer;
 }
 .conversation-footer {

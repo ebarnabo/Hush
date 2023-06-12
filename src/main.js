@@ -13,6 +13,7 @@ import Chat from './components/ChatPage.vue';
 import Validation from './components/validation.vue';
 
 
+
 // Créez l'instance du routeur et définissez les routes
 const router = createRouter({
   history: createWebHashHistory(),
