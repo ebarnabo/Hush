@@ -37,6 +37,16 @@
 
 <script>
 export default {
+    // ouverture de mon application
+    created() {
+    window.addEventListener('beforeunload', this.clearUsedIdentifiant);
+    window.addEventListener('DOMContentLoaded', this.clearUsedIdentifiant);
+  },
+  // fermeture de mon application
+  beforeDestroy() {
+    window.removeEventListener('beforeunload', this.clearUsedIdentifiant);
+    window.removeEventListener('DOMContentLoaded', this.clearUsedIdentifiant);
+  },
   methods: {
     inscription(event) {
       event.preventDefault();
@@ -45,7 +55,23 @@ export default {
       var pseudo = document.getElementById('pseudo').value;
       var email = document.getElementById('email').value;
 
-      // Construire l'URL d'inscription avec les paramètres
+      // Vérifier si l'adresse email a déjà été utilisée
+      var usedMailList = JSON.parse(localStorage.getItem('usedMailList')) || [];
+      if (usedMailList.includes(email)) {
+        // Afficher le message d'erreur
+        Swal.fire(
+          'Il y a une erreur',
+          'Erreur: Cette adresse email est déjà utilisée. Veuillez en utiliser une autre.',
+          'error'
+        );
+        return;
+      }
+
+      // Ajout adresse email à la liste des emails utilisés
+      usedMailList.push(email);
+      localStorage.setItem('usedMailList', JSON.stringify(usedMailList));
+
+      // URL d'inscription avec les paramètres
       var url = 'https://trankillprojets.fr/wal/wal.php?inscription&identite=' + encodeURIComponent(pseudo) + '&mail=' + encodeURIComponent(email);
 
       // Effectuer la requête HTTP GET
@@ -55,7 +81,6 @@ export default {
           // Vérifier la réponse de l'API
           if (data.etat.reponse === 1) {
             // Afficher le message de succès
-            //alert(data.etat.message);
             Swal.fire(
               'En attente de validation',
               'Merci de vous être inscrit à notre service de chat ! Pour activer votre compte, veuillez cliquer sur le lien dans vos mails',
@@ -63,7 +88,6 @@ export default {
             )
           } else {
             // Afficher le message d'erreur
-            //alert('Erreur: ' + data.etat.message);
             Swal.fire(
               'Il y a une erreur',
               'Erreur: Vous êtes déjà inscrit sur HUSH. Un mail a été envoyé sur votre boite mail.',
@@ -73,12 +97,12 @@ export default {
         })
         .catch(error => {
           console.error('Erreur:', error);
-          // Afficher le message d'erreur
           console.log('Une erreur s\'est produite lors de l\'inscription.');
         });
     }
   }
 }
+
 </script>
 
 <style scoped lang="scss">

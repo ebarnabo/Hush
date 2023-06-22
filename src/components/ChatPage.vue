@@ -19,15 +19,17 @@
         <button class="emoji-button" @click="addEmoji('😍')">😍</button>
         <button class="emoji-button" @click="addEmoji('🔥')">🔥</button>
       </div>
+
       <div class="chat-footer">
         <input type="text" v-model="message" @keydown.enter="sendMessage" placeholder="Message..." />
-        <button class="send-button" @click="sendMessage"><i class="fa-solid fa-arrow-up" ></i></button>
+        <button class="send-button" @click="sendMessage"><i class="fa-solid fa-arrow-up"></i></button>
       </div>
     </div>
 
     <!-- Autrement on affiche ça -->
     <div v-else>
       <div class="conversation-header">
+        
       <img src="../assets/hush.png" alt="Image" class="header-image" id="header-list-img">
       </div>
       <ul class="conversation-list scrollable-list">
@@ -46,10 +48,29 @@
 </template>
 
 
-<script>
+<script lang="js">
+import QRCode from 'qrcode-svg';
+
+
 export default {
+  mounted() {
+    this.checkAccess();
+  },
+    // ouverture de mon application
+    created() {
+    window.addEventListener('beforeunload', this.clearUsedIdentifiant);
+    window.addEventListener('DOMContentLoaded', this.clearUsedIdentifiant);
+  },
+  // fermeture de mon application
+  beforeDestroy() {
+    window.removeEventListener('beforeunload', this.clearUsedIdentifiant);
+    window.removeEventListener('DOMContentLoaded', this.clearUsedIdentifiant);
+  },
+  
   data() {
     return {
+      // Texte du qr code
+      qrCodeText: 'Votre texte ici',
       conversations: [
         { user: "Utilisateur 1", messages: [],},
         { user: "Utilisateur 2", messages: [] },
@@ -88,11 +109,11 @@ export default {
       this.selectedConversation = null;
     },
     sendMessage() {
-  if (this.message.trim() !== "") {
-    this.selectedConversation.messages.push({
-      content: this.message.trim(),
-      sender: 'Utilisateur 1',
-      timestamp: new Date().toISOString(), // Ceci est la nouvelle ligne
+    if (this.message.trim() !== "") {
+      this.selectedConversation.messages.push({
+        content: this.message.trim(),
+        sender: 'Utilisateur 1',
+        timestamp: new Date().toISOString(), // Ceci est la nouvelle ligne
     });
     this.message = "";
 
@@ -102,7 +123,6 @@ export default {
   }
   this.scrollToBottom();
     },
-
     //Ajouter un emoji
     addEmoji(emoji) {
       this.message += emoji;
@@ -158,14 +178,26 @@ if (formValues) {
       }
     })
     },
+    generateQRCode() {
+    const qrCodeDiv = document.getElementById('qrcode');
+    QRCode.toCanvas(qrCodeDiv, this.qrCodeText, function (error) {
+      if (error) {
+        console.error(error);
+      }
+    });
+  },
+
     settings(){
+      
       Swal.fire({
   title: '<strong>Options</u></strong>',
   html:
       '<h5>Choix du thème du système</h5>'+
       '<input type="radio" id="lighttheme" name="contact" value="Clair " />'+
       '<label id="lightthemes" for="lighttheme"> Clair </label>'+
-
+      '<canvas id="qrcode"></canvas>'+
+      '<button @click="generateQRCode">Générer le code QR</button>'+
+      
       '<input type="radio" @click="toggleMode id="darktheme" name="contact" value="Thème sombre " />'+
       '<label id="darkthemes"for="darktheme"> Sombre </label>',
   //showCloseButton: true,
@@ -179,6 +211,7 @@ if (formValues) {
   cancelButtonAriaLabel: 'Annuler'
 })
     },
+
     previewMessage(conversation) {
     if (conversation.messages.length > 0) {
       let lastMessage = conversation.messages[conversation.messages.length - 1];
@@ -188,6 +221,7 @@ if (formValues) {
     }
     return "";
     },
+
     formatTimestamp(conversation) {
     if (conversation.messages.length > 0) {
       let lastMessage = conversation.messages[conversation.messages.length - 1];
@@ -209,6 +243,20 @@ if (formValues) {
       }
   }
   return "";
+    },
+
+    checkAccess() {
+      var identifiantUsed = localStorage.getItem('identifiantUsed');
+
+      if (!identifiantUsed) {
+        Swal.fire(
+          'Accès interdit',
+          'Vous ne pouvez pas accéder à cette page sans être connecté.',
+          'error'
+        )
+        // Redirige l'utilisateur non connecté vers la page l'accueil
+        this.$router.push('/'); 
+      }
     },
 
   },
@@ -320,7 +368,7 @@ input{
   scroll-behavior: smooth;
 }
 .msg-preview{
-  font-size: 0.8em;
+  font-size: 1em;
   color: #333333 !important;
 }
 
