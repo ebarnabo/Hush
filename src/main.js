@@ -5,7 +5,6 @@ import App from './App.vue';
 import ToggleButton from './components/btn-mode.vue';
 
 
-
 import { createRouter, createWebHashHistory } from 'vue-router';
 
 // Importez vos composants .vue
