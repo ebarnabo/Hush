@@ -430,7 +430,7 @@ checkNewMessages() {
                       conversation.messages.push({
                         content: message.message,
                         sender: 'Utilisateur 2', // Le message est reçu, donc le sender est l'autre utilisateur
-                        timestamp: message.timestamp
+                        timestamp: new Date().toISOString()
                       });
                     }
                   });

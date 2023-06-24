@@ -11,9 +11,6 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import Home from './components/inscription.vue';
 import Login from './components/login.vue';
 import Chat from './components/ChatPage.vue';
-import Validation from './components/validation.vue';
-
-
 
 
 // Créez l'instance du routeur et définissez les routes
@@ -22,7 +19,6 @@ const router = createRouter({
   routes: [
     { path: '/', component: Home },
     { path: '/login', component: Login },
-    { path: '/validation', component: Validation },
     { path: '/chat', component: Chat },
     // Tous autres url non existant redirgera vers la page d'accueil
     { path: '/:pathMatch(.*)*', redirect: '/' }
