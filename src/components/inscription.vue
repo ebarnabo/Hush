@@ -5,7 +5,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col">
-            <img src="../assets/hush.png" class="mx-auto d-block" alt="Responsive image" height="auto" width="200px">
+            <img src="../assets/hush.png" class="mx-auto d-block mb-5" alt="Responsive image" height="auto" width="200px">
           </div>
         </div>
       </div>

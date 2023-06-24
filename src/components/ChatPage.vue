@@ -4,16 +4,17 @@
     <div v-if="selectedConversation">
       <div class="chat-header">
         <button class="back-button" @click="goBack"><i class="fa-solid fa-angle-left"></i></button>
-        <h2 class="user-name"><span class="i-circle">U</span>  {{ selectedConversation.user }}</h2>
-        <button class="action-button" @click="deleteRelation()"><i class="fa-solid fa-trash circle-icon" style="color: white;"></i></button>
+        <h2 class="user-name"><span class="i-circle" id="userLetter">{{ firstLetterOfUser }}</span>  {{ selectedConversation.user }}</h2>
+        <button class="action-button" @click="deleteRelation"><i class="fa-solid fa-trash circle-icon" style="color: white;"></i></button>
       </div>
       <div class="chat-body" ref="chatBody">
         <div v-for="(message, index) in selectedConversation.messages" :key="index">
-          <div class="message-bubble" :class="{'sender-message': message.sender !== 'Utilisateur 1', 'receiver-message': message.sender === 'Utilisateur 1'}">
+          <div class="message-bubble" :class="{'sender-message': message.sender === 'Utilisateur 1', 'receiver-message': message.sender !== 'Utilisateur 1', 'from-user': message.sender === 'Utilisateur 1'}">
             {{ message.content }}
           </div>
         </div>
       </div>
+      
       <div class="emoji-picker">
         <button class="emoji-button" @click="addEmoji('😃')">😃</button>
         <button class="emoji-button" @click="addEmoji('😍')">😍</button>
@@ -34,32 +35,36 @@
       </div>
       <ul class="conversation-list scrollable-list">
         <li v-for="(conversation, index) in conversations" :key="index" @click="selectConversation(conversation)">
-          <h4><span class="i-circle">U</span> {{ conversation.user }}</h4>
+          <h4><span class="i-circle">{{ conversation.user.charAt(0).toUpperCase() }}</span> {{ conversation.user }}</h4>
           <p class="msg-preview">{{ previewMessage(conversation) }}</p>
           <span class="timestamp">{{ formatTimestamp(conversation) }}</span> <i class="fa-solid fa-angle-right"></i>
         </li>
       </ul>
+
       <div class="conversation-footer">
         <button @click="addRelation"><i class="fa-solid fa-user-plus" style="color: #ffffff;"></i></button>
         <button @click="settings()" ><i class="fa-solid fa-gear" style="color: #ffffff;"></i></button>
+        <button @click="checkNewMessages()" ><i class="fa-solid fa-arrows-rotate fa-spin" style="color: #ffffff;"></i></button>
+        <button @click="logOut()" ><i class="fa-solid fa-right-from-bracket" style="color: #ffffff;"></i></button>
+
+        
       </div>
     </div>
   </div>
 </template>
 
-
 <script lang="js">
-import QRCode from 'qrcode-svg';
-
-
 export default {
   mounted() {
     this.checkAccess();
+    this.updateConversationList();
+    
   },
     // ouverture de mon application
     created() {
     window.addEventListener('beforeunload', this.clearUsedIdentifiant);
     window.addEventListener('DOMContentLoaded', this.clearUsedIdentifiant);
+    this.checkNewMessages();
   },
   // fermeture de mon application
   beforeDestroy() {
@@ -69,60 +74,78 @@ export default {
   
   data() {
     return {
-      // Texte du qr code
+      // identifiant utilisé pour la session
+      identifiant: localStorage.getItem('identifiantUsed'),
+
+      // Relations de l'utilisateur
+      relations: [], 
+
       qrCodeText: 'Votre texte ici',
-      conversations: [
-        { user: "Utilisateur 1", messages: [],},
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        { user: "Utilisateur 2", messages: [] },
-        
-        // Ajoutez plus de conversations ici si nécessaire
-      ],
+
+      // Conversations de l'utilisateur
+      conversations: [], 
+
       selectedConversation: null,
       message: "",
-    };
+    }; 
   },
-  methods: { 
-    // Fonction pour ouvrir une conversation
-    selectConversation(conversation) {
-      this.selectedConversation = conversation;
+  created() {
+    this.getRelations();
+  },
+
+  computed: {
+    firstLetterOfUser() {
+      if (this.selectedConversation && this.selectedConversation.user) {
+        return this.selectedConversation.user.charAt(0).toUpperCase();
+        }
+        return '';
+      }
     },
+
+  methods: { 
     // retour à la liste des convs
     goBack() {
       this.selectedConversation = null;
     },
+
     sendMessage() {
-    if (this.message.trim() !== "") {
-      this.selectedConversation.messages.push({
-        content: this.message.trim(),
-        sender: 'Utilisateur 1',
-        timestamp: new Date().toISOString(), // Ceci est la nouvelle ligne
-    });
+  if (this.message.trim() !== "") {
+    const identifiant = localStorage.getItem('identifiantUsed');
+    const identifiantRelation = this.selectedConversation.relation;
+    const message = this.message.trim();
+
+    const url = `https://trankillprojets.fr/wal/wal.php?ecrire&identifiant=${encodeURIComponent(identifiant)}&relation=${encodeURIComponent(identifiantRelation)}&message=${encodeURIComponent(message)}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data.etat.reponse === 1) {
+          // Le message a été envoyé avec succès
+          const newMessage = {
+            content: message,
+            sender: 'Utilisateur 1',
+            timestamp: new Date().toISOString()
+          };
+          this.selectedConversation.messages.push(newMessage);
+        } else {
+          // Une erreur s'est produite lors de l'envoi du message
+          console.error('Erreur lors de l\'envoi du message:', data.etat.message);
+        }
+      })
+      .catch(error => {
+        // Une erreur s'est produite lors de la requête
+        console.error('Erreur lors de l\'envoi du message:', error);
+      });
+
     this.message = "";
 
     this.$nextTick(() => {
       this.scrollToBottom();
     });
   }
-  this.scrollToBottom();
-    },
+},
+
+
     //Ajouter un emoji
     addEmoji(emoji) {
       this.message += emoji;
@@ -133,59 +156,6 @@ export default {
       const chatBody = this.$refs.chatBody;
       chatBody.scrollTop = chatBody.scrollHeight;
     },
-    
-    async addRelation(){
-      const { value: formValues } = Swal.fire({
-  title: 'Ajouter une nouvelle relation',
-  html:
-    '<input type="text" id="swal-input1" class="swal2-input" placeholder="identifiant">' +
-    
-    '<input type="mail" id="swal-input2" class="swal2-input" placeholder="email" required>',
-  
-  focusConfirm: false,
-  preConfirm: () => {
-    return [
-      document.getElementById('swal-input1').value,
-      document.getElementById('swal-input2').value
-    ]
-  }
-})
-
-if (formValues) {
-  Swal.fire(JSON.stringify(formValues))
-}
-    },
-    deleteRelation(){
-      Swal.fire({
-      title: 'Valider la suppression de la relation?',
-      text: "Vous ne pourrez plus contacté cette personne",
-      icon: 'delete',
-      showCancelButton: true,
-      confirmButtonColor: '#4E3296',
-      cancelButtonColor: '#d33',
-      textColor: '#4E3296',
-      confirmButtonText: 'Oui !',
-      cancelButtonText: 'Annuler'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire(
-          'Suppression!',
-          'Votre relation avec est supprimée',
-          'success'
-        )
-        // Retour à la liste de conversation
-        this.goBack()
-      }
-    })
-    },
-    generateQRCode() {
-    const qrCodeDiv = document.getElementById('qrcode');
-    QRCode.toCanvas(qrCodeDiv, this.qrCodeText, function (error) {
-      if (error) {
-        console.error(error);
-      }
-    });
-  },
 
     settings(){
       
@@ -196,7 +166,7 @@ if (formValues) {
       '<input type="radio" id="lighttheme" name="contact" value="Clair " />'+
       '<label id="lightthemes" for="lighttheme"> Clair </label>'+
       '<canvas id="qrcode"></canvas>'+
-      '<button @click="generateQRCode">Générer le code QR</button>'+
+      //'<button @click="generateQRCode">Générer le code QR</button>'+
       
       '<input type="radio" @click="toggleMode id="darktheme" name="contact" value="Thème sombre " />'+
       '<label id="darkthemes"for="darktheme"> Sombre </label>',
@@ -211,6 +181,27 @@ if (formValues) {
   cancelButtonAriaLabel: 'Annuler'
 })
     },
+
+    logOut() {
+    Swal.fire({
+      title: 'Êtes-vous sûr de vouloir vous déconnecter ?',
+      showCancelButton: true,
+      confirmButtonText: 'Oui',
+      confirmButtonColor:'#FF2905',
+      cancelButtonText: 'Non'
+
+    }).then((result) => {
+
+      if (result.isConfirmed) {
+
+        // Suppression de l'id du localStorage
+        localStorage.removeItem('identifiantUsed');
+
+        // Rediriger vers la page de login
+        this.$router.push('/login');
+      }
+    });
+  },
 
     previewMessage(conversation) {
     if (conversation.messages.length > 0) {
@@ -259,7 +250,248 @@ if (formValues) {
       }
     },
 
+    getRelations() {
+      var url = 'https://trankillprojets.fr/wal/wal.php?relation&identifiant=' + encodeURIComponent(this.identifiant);
+      
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data.etat.reponse === 1) {
+            this.relations = data.relation;
+            this.getConversations();
+          } else {
+            // Gestion d'erreur
+          }
+          this.checkNewMessages();
+        });
+    },
+    
+    // Fonction pour ouvrir une conversation
+    getConversations() {
+  let identifiant = localStorage.getItem('identifiantUsed');
+  let url = 'https://trankillprojets.fr/wal/wal.php?messages&identifiant=' + encodeURIComponent(identifiant);
+  
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      if (data.etat.reponse === 1) {
+        this.conversations = this.relations.map(relation => {
+          let relationMessages = data.messages.filter(message => message.pseudo === relation.pseudo);
+          return {
+            user: relation.pseudo,
+            messages: relationMessages.map(message => {
+              return {
+                sender: message.envoi === identifiant ? 'Utilisateur 1' : 'Utilisateur 2',
+                content: message.message
+              };
+            })
+          };
+        });
+      } else {
+        // Gestion d'erreur
+      }
+    });
+},
+    selectConversation(conversation) {
+      this.selectedConversation = conversation;
+    },
+
+    async addRelation() {
+      const { value: formValues } = await Swal.fire({
+        title: 'Ajouter une nouvelle relation',
+        html:
+          '<input type="email" id="swal-input1" class="swal2-input" placeholder="email" required>',
+        focusConfirm: false,
+        preConfirm: () => {
+          return [
+            document.getElementById('swal-input1').value
+          ]
+        }
+      });
+  if (formValues) {
+    let identifiant = localStorage.getItem('identifiantUsed');
+    let url = `https://trankillprojets.fr/wal/wal.php?lier&identifiant=${encodeURIComponent(identifiant)}&mail=${encodeURIComponent(formValues[0])}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        console.log('Add relation response:', data);
+        if (data.etat.reponse === 1) {
+          // Mise à jour de la liste des conversations après l'ajout de la relation
+          this.updateConversationList();
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Une erreur est survenue lors de l\'ajout de la relation'
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Erreur:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Une erreur est survenue lors de l\'ajout de la relation'
+        });
+      });
+  }
+},
+
+getRelationId() {
+  if (this.selectedConversation) {
+    const conversation = this.conversations.find(
+      conv => conv.user === this.selectedConversation.user
+    );
+    if (conversation) {
+      return conversation.relation;
+    }
+  }
+  return null;
+},
+
+deleteRelation() {
+  const relationId = this.getRelationId();
+  if (relationId) {
+    Swal.fire({
+      title: 'Confirmation',
+      text: 'Voulez-vous vraiment supprimer cette relation ?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Oui',
+      cancelButtonText: 'Non',
+    }).then(result => {
+      if (result.isConfirmed) {
+        const identifiant = this.identifiant;
+        const url = `https://trankillprojets.fr/wal/wal.php?delier&identifiant=${encodeURIComponent(identifiant)}&relation=${encodeURIComponent(relationId)}`;
+
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            if (data.etat.reponse === 1) {
+              // Suppression réussie
+              Swal.fire({
+                title: 'Succès',
+                text: 'La relation a été supprimée avec succès.',
+                icon: 'success',
+              }).then(() => {
+                // Mettez à jour la liste des conversations après la suppression de la relation
+                this.updateConversationList();
+                // Revenir à la liste des discussions
+                this.selectedConversation = null;
+              });
+            } else {
+              console.error('Erreur lors de la suppression de la relation:', data.etat.message);
+              Swal.fire({
+                title: 'Erreur',
+                text: 'Une erreur est survenue lors de la suppression de la relation.',
+                icon: 'error',
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Erreur lors de la suppression de la relation:', error);
+            Swal.fire({
+              title: 'Erreur',
+              text: 'Une erreur est survenue lors de la suppression de la relation.',
+              icon: 'error',
+            });
+          });
+      }
+    });
+  } else {
+    Swal.fire('Aucune relation sélectionnée');
+  }
+},
+
+
+checkNewMessages() {
+  setInterval(() => {
+    const identifiant = localStorage.getItem('identifiantUsed');
+    const url = `https://trankillprojets.fr/wal/wal.php?relations&identifiant=${encodeURIComponent(identifiant)}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data.etat.reponse === 1) {
+          const relations = data.relations;
+
+          relations.forEach(relation => {
+            const identifiantRelation = relation.relation;
+            const url = `https://trankillprojets.fr/wal/wal.php?lire&identifiant=${encodeURIComponent(identifiant)}&relation=${encodeURIComponent(identifiantRelation)}`;
+            fetch(url)
+              .then(response => response.json())
+              .then(data => {
+                if (data.etat.reponse === 1 && data.messages.length > 0) {
+                  const messages = data.messages;
+
+                  messages.forEach(message => {
+                    const conversation = this.conversations.find(conversation => conversation.relation === identifiantRelation);
+
+                    if (conversation) {
+                      conversation.messages.push({
+                        content: message.message,
+                        sender: 'Utilisateur 2', // Le message est reçu, donc le sender est l'autre utilisateur
+                        timestamp: message.timestamp
+                      });
+                    }
+                  });
+                }
+              })
+              .catch(error => {
+                console.error('Erreur lors de la récupération des messages:', error);
+              });
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Erreur lors de la récupération des relations:', error);
+      });
+  }, 1000);
+},
+
+
+
+async updateConversationList() {
+  let identifiant = localStorage.getItem('identifiantUsed');
+  let url = `https://trankillprojets.fr/wal/wal.php?relations&identifiant=${encodeURIComponent(identifiant)}`;
+
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      if (data.etat.reponse === 1) {
+        // Effacer les conversations existantes
+        this.conversations = [];
+
+        // Ajouter les nouvelles conversations dans la liste de conversations
+        for (let i = 0; i < data.relations.length; i++) {
+          let newConversation = { user: data.relations[i].identite, messages: [], relation: data.relations[i].relation };
+          this.conversations.push(newConversation);
+        }
+
+        // Stocker les conversations dans le localStorage
+        localStorage.setItem('kontak', JSON.stringify(this.conversations));
+      } else {
+        console.error('Erreur lors de la mise à jour de la liste des conversations:', data.etat.message);
+      }
+    })
+    .catch(error => {
+      console.error('Erreur lors de la récupération des relations:', error);
+    });
+},
+
+
+getMessageClass(message) {
+    return {
+      'sender-message': message.sender !== 'Utilisateur 1',
+      'receiver-message': message.sender === 'Utilisateur 1'
+    };
   },
+
+  },
+
+
+  // à utiliser si ne fonctionne pas updateConversationList()
+
+  
 };
 </script>
 
@@ -277,6 +509,10 @@ input{
   padding-right: 20px;
   float: right;
 }
+.from-user{
+  align-self: flex-end;
+}
+
 .fa-angle-right{
   float: right;
   margin-top: -45px;
@@ -318,7 +554,7 @@ input{
 
 .scrollable-list {
   overflow-y: auto;
-  max-height: 80vh; /* Ajoutez ici la hauteur maximale souhaitée */
+  min-height: 80vh; 
 }
 .fa-solid {
   color: white;
@@ -384,14 +620,33 @@ input{
 
 .sender-message {
   background-color: $accentColor;
+  color: #fff;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.chat-body {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+  height: 80vh;
+  scroll-behavior: smooth;
+}
+
+.chat-body .message-bubble {
   align-self: flex-start;
 }
+
+.chat-body .sender-message {
+  align-self: flex-end;
+}
+
 
 .receiver-message {
   background-color: #3B3B3D;
   border: $bgDark;
   color: #fff;
-  align-self: flex-end;
+  align-self: flex-start;
 }
 
 .chat-footer {
