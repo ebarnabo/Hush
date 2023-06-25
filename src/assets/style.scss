@@ -3,6 +3,7 @@ $accentColor : #4E3296;
 $bgDark : #1E1E1E ;
 $bgWhite : #D5D5D5;
 
+
 a {
     text-decoration: none;
     background-color: $accentColor;
@@ -11,6 +12,10 @@ a {
 }
 a:hover{
   animation: headShake 1s ;
+}
+
+.btn-xs{
+  scale: 0.8;
 }
   body{
     background: $bgWhite;

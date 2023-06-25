@@ -1,13 +1,18 @@
 <template>
   <div class="chat-container">
-    <!-- Si on clique sur une conversation on affiche cette div -->
     <div v-if="selectedConversation">
-      <div class="chat-header">
-        <button class="back-button" @click="goBack"><i class="fa-solid fa-angle-left"></i></button>
-        <h2 class="user-name"><span class="i-circle" id="userLetter">{{ firstLetterOfUser }}</span>  {{ selectedConversation.user }}</h2>
-        <button class="action-button" @click="deleteRelation"><i class="fa-solid fa-trash circle-icon" style="color: white;"></i></button>
+      <div class="chat-header row">
+        <div class="col">
+          <button class="back-button" @click="goBack"><i class="fa-solid fa-angle-left"></i></button>
+        </div>
+        <div class="col">
+          <h2 class="user-name"><span class="i-circle" id="userLetter">{{ firstLetterOfUser }}</span>  {{ selectedConversation.user }}</h2>
+        </div>
+        <div class="col">
+          <button class="action-button" @click="deleteRelation"><i class="fa-solid fa-trash circle-icon" style="color: white;"></i></button>
+        </div>
       </div>
-      <div class="chat-body" ref="chatBody">
+      <div class="chat-body">
         <div v-for="(message, index) in selectedConversation.messages" :key="index">
           <div class="message-bubble" :class="{'sender-message': message.sender === 'Utilisateur 1', 'receiver-message': message.sender !== 'Utilisateur 1', 'from-user': message.sender === 'Utilisateur 1'}">
             {{ message.content }}
@@ -27,27 +32,35 @@
       </div>
     </div>
 
-    <!-- Autrement on affiche ça -->
     <div v-else>
       <div class="conversation-header">
-        
-      <img src="../assets/hush.png" alt="Image" class="header-image" id="header-list-img">
+        <div class="row">
+          <div class="col">
+            <img src="../assets/hush.png" alt="Image" class="header-image" id="header-list-img">
+          </div>
+        </div>
       </div>
       <ul class="conversation-list scrollable-list">
         <li v-for="(conversation, index) in conversations" :key="index" @click="selectConversation(conversation)">
           <h4><span class="i-circle">{{ conversation.user.charAt(0).toUpperCase() }}</span> {{ conversation.user }}</h4>
-          <p class="msg-preview">{{ previewMessage(conversation) }}</p>
+          <p class="msg-preview"><i id="notif" class="fa-solid fa-circle" style="color: #0061ff;"></i>  {{ previewMessage(conversation) }}</p>
           <span class="timestamp">{{ formatTimestamp(conversation) }}</span> <i class="fa-solid fa-angle-right"></i>
         </li>
       </ul>
 
-      <div class="conversation-footer">
-        <button @click="addRelation"><i class="fa-solid fa-user-plus" style="color: #ffffff;"></i></button>
-        <button @click="settings()" ><i class="fa-solid fa-gear" style="color: #ffffff;"></i></button>
-        <button @click="checkNewMessages()" ><i class="fa-solid fa-arrows-rotate fa-spin" style="color: #ffffff;"></i></button>
-        <button @click="logOut()" ><i class="fa-solid fa-right-from-bracket" style="color: #ffffff;"></i></button>
-
-        
+      <div class="conversation-footer row">
+        <div class="col">
+          <button @click="addRelation"><i class="fa-solid fa-user-plus" style="color: #ffffff;"></i></button>
+        </div>
+        <div class="col">
+          <button @click="settings()"><i class="fa-solid fa-gear" style="color: #ffffff;"></i></button>
+        </div>
+        <div class="col">
+          <button @click="checkNewMessages()"><i class="fa-solid fa-arrows-rotate fa-spin" style="color: #ffffff;"></i></button>
+        </div>
+        <div class="col">
+          <button @click="logOut()"><i class="fa-solid fa-right-from-bracket" style="color: #ffffff;"></i></button>
+        </div>
       </div>
     </div>
   </div>

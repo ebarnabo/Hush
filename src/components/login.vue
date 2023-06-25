@@ -10,36 +10,25 @@
         </div>
       </div>
       <div class="d-flex justify-content-center">
-        <div class="form-floating mt-2 mb-5 col-sm-12 col-md-12 col-lg-10 col-xl-6 col-xxl-6">
+        <div class="form-floating mt-2 mb-5">
           <input type="text" class="form-control" id="identifiant" placeholder="Entrez votre nom d'utilisateur" required>
           <label for="identifiant"><i class="fas fa-user"></i>   Identifiant</label>
-          <div class="user d-flex align-items-center flex-wrap">
-  <div v-for="(user, index) in savedUsers" :key="index" class="d-flex align-items-center">
-    <button @click="login(user.identifiant)" class="btn btn-primary text-center mt-3 mx-1">
-      <i class="fa-solid fa-bolt-lightning fa-beat-fade" style="color: #f7ca26;"></i> {{user.pseudo}}
-    </button>
-    <button @click="deleteUser(index)" class="btn-danger btn btn-default btn-xs mt-3 mx-1">
-      <i class="fa-solid fa-trash"></i>
-    </button>
-  </div>
-</div>
-
-
         </div>
       </div>
       <p class="text-center">OU</p>
       <div class="d-flex justify-content-center">
-        <button type="submit" class="btn btn-primary btn-block text-center mb-5 login-with-apple-btn" title="Connexion" onclick="Connexion()">Connexion avec Apple</button>
-        <button type="submit" class="btn btn-primary btn-block text-center mb-5 mx-3 login-with-google-btn" title="Connexion" onclick="Connexion()">Connexion avec Google</button>
+        <button type="submit" class="btn btn-primary btn-block text-center mb-5 login-with-apple-btn">Connexion avec Apple</button>
+        <button type="submit" class="btn btn-primary btn-block text-center mb-5 mx-3 login-with-google-btn">Connexion avec Google</button>
       </div>
       <div class="d-flex justify-content-center">
-        <button type="submit" class="btn btn-primary btn-block text-center mb-5" title="Connexion">Connexion</button>
+        <button type="submit" class="btn btn-primary btn-block text-center mb-5">Connexion</button>
       </div>
       <p class="text-center mx-3">Pas encore inscrit ? <router-link to="/"> S'inscrire </router-link></p>
     </form>
   </div>
   <ToggleButton />
 </template>
+
 
 <script>
 
@@ -181,7 +170,5 @@ export default {
 
 <style scoped>
 /* Vos styles CSS ici */
-.btn-xs{
-  scale: 0.8;
-}
+
 </style>
