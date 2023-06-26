@@ -526,9 +526,11 @@ getMessageClass(message) {
 };
 </script>
 
-<!-- Style du chat  -->
+
 <style scoped lang="scss">
 @import '../assets/style.scss';
+
+// Partie responsive
 
 //Pour les appareils desktop (grandes résolutions) :
 @media only screen and (min-width: 1200px) {
@@ -580,9 +582,8 @@ getMessageClass(message) {
   min-height: 70vh; 
 }
 
-
 .chat-body {
-  min-height: 75vh;
+  min-height: 70vh;
 }
 .conversation-footer {
   height: 10vh;
@@ -593,6 +594,7 @@ getMessageClass(message) {
 
 }
 
+// Style du chat  
 input{
   border-radius: 7px;
   outline: none; 
