@@ -585,7 +585,7 @@ input{
 
 .scrollable-list {
   overflow-y: auto;
-  min-height: 80vh; 
+  min-height: 70vh; 
 }
 .fa-solid {
   color: white;
@@ -631,7 +631,7 @@ input{
   flex-grow: 1;
   padding: 20px;
   overflow-y: auto;
-  height: 80vh;
+  height: 70vh;
   scroll-behavior: smooth;
 }
 .msg-preview{
@@ -727,7 +727,7 @@ input{
 .conversation-footer {
   display: flex;
   justify-content: center;
-  height: 10vh;
+  min-height: 10vh;
   background-color: $accentColor;
 }
 .conversation-header {
