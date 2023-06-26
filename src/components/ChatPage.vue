@@ -591,6 +591,10 @@ getMessageClass(message) {
 .conversation-header {
   height: 10vh;
 }
+.conversation-footer button {
+  margin-left: 7%;
+  margin-right: 7%;
+}
 
 }
 
