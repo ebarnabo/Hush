@@ -586,14 +586,14 @@ getMessageClass(message) {
   min-height: 70vh;
 }
 .conversation-footer {
-  height: 10vh;
+  height: 15vh;
 }
 .conversation-header {
   height: 10vh;
 }
 .conversation-footer button {
-  margin-left: 7%;
-  margin-right: 7%;
+  margin-left: 6% !important;
+  margin-right: 6% !important; 
 }
 
 }
