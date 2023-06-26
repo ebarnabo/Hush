@@ -5,7 +5,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col">
-            <img src="../assets/hush.png" class="mx-auto d-block mb-5 img-fluid" alt="Responsive image" height="auto" width="200px">        
+            <img src="../assets/hush.png" class="mx-auto d-block mb-5 img-fluid" alt="Responsive image" height="auto" width="120px">        
           </div>
         </div>
       </div>
@@ -27,11 +27,11 @@
 
         </div>
       </div>
-      <p class="text-center">OU</p>
+      <!-- <p class="text-center">OU</p>
       <div class="d-flex justify-content-center">
         <button type="submit" class="btn btn-primary btn-block text-center mb-5 login-with-apple-btn" title="Connexion" onclick="Connexion()">Connexion avec Apple</button>
         <button type="submit" class="btn btn-primary btn-block text-center mb-5 mx-3 login-with-google-btn" title="Connexion" onclick="Connexion()">Connexion avec Google</button>
-      </div>
+      </div> -->
       <div class="d-flex justify-content-center">
         <button type="submit" class="btn btn-primary btn-block text-center mb-5" title="Connexion">Connexion</button>
       </div>

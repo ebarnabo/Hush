@@ -31,24 +31,27 @@
     <div v-else>
       <div class="conversation-header">
         
-      <img src="../assets/hush.png" alt="Image" class="header-image" id="header-list-img">
+      <img src="../assets/icon.png" alt="Image" class="header-image mx-auto d-block" id="header-list-img" >
       </div>
       <ul class="conversation-list scrollable-list">
-        <li v-for="(conversation, index) in conversations" :key="index" @click="selectConversation(conversation)">
-          <h4><span class="i-circle">{{ conversation.user.charAt(0).toUpperCase() }}</span> {{ conversation.user }}</h4>
-          <p class="msg-preview"><i id="notif" class="fa-solid fa-circle" style="color: #0061ff;"></i>  {{ previewMessage(conversation) }}</p>
-          <span class="timestamp">{{ formatTimestamp(conversation) }}</span> <i class="fa-solid fa-angle-right"></i>
-        </li>
-      </ul>
+  <li v-for="(conversation, index) in conversations" :key="index" @click="selectConversation(conversation)">
+    <h4><span class="i-circle">{{ conversation.user.charAt(0).toUpperCase() }}</span> {{ conversation.user }}</h4>
+    <p class="msg-preview">
+      <i v-if="conversation.isNewMessage" id="notif" class="fa-solid fa-circle" style="color: #0061ff;"></i>
+      {{ previewMessage(conversation) }}
+    </p>
+    <span class="timestamp">{{ formatTimestamp(conversation) }}</span> <i class="fa-solid fa-angle-right"></i>
+  </li>
+</ul>
 
-      <div class="conversation-footer">
-        <button @click="addRelation"><i class="fa-solid fa-user-plus" style="color: #ffffff;"></i></button>
-        <button @click="settings()" ><i class="fa-solid fa-gear" style="color: #ffffff;"></i></button>
-        <button @click="checkNewMessages()" ><i class="fa-solid fa-arrows-rotate fa-spin" style="color: #ffffff;"></i></button>
-        <button @click="logOut()" ><i class="fa-solid fa-right-from-bracket" style="color: #ffffff;"></i></button>
 
-        
-      </div>
+      <div class="conversation-footer d-flex justify-content-center">
+  <button @click="addRelation"><i class="fa-solid fa-user-plus" style="color: #ffffff;"></i></button>
+  <button @click="settings()" ><i class="fa-solid fa-gear" style="color: #ffffff;"></i></button>
+  <!-- <button @click="checkNewMessages()" ><i class="fa-solid fa-arrows-rotate fa-spin" style="color: #ffffff;"></i></button> -->
+  <button @click="logOut()" ><i class="fa-solid fa-right-from-bracket" style="color: #ffffff;"></i></button>
+</div>
+
     </div>
   </div>
 </template>
@@ -87,6 +90,11 @@ export default {
 
       selectedConversation: null,
       message: "",
+      showNotif: false,
+      selectedConversationIndex: null,
+
+
+
     }; 
   },
   created() {
@@ -203,15 +211,23 @@ export default {
     });
   },
 
-    previewMessage(conversation) {
-    if (conversation.messages.length > 0) {
-      let lastMessage = conversation.messages[conversation.messages.length - 1];
-      return lastMessage.content.length > 50 ? 
-        lastMessage.content.substring(0, 48) + '...' : 
-        lastMessage.content;
+  // Affiche une preview du message reçu
+  previewMessage(conversation) {
+  if (conversation.messages.length > 0) {
+    let lastMessage = conversation.messages[conversation.messages.length - 1];
+    if (lastMessage.new) {
+
+      //Mise à jour de la notif
+      this.showNotif = true; // 
     }
-    return "";
-    },
+    return lastMessage.content.length > 50 ? 
+      lastMessage.content.substring(0, 48) + '...' : 
+      lastMessage.content;
+  }
+  return "";
+},
+
+
 
     formatTimestamp(conversation) {
     if (conversation.messages.length > 0) {
@@ -236,6 +252,7 @@ export default {
   return "";
     },
 
+    // Force la connexion pour accéder au chat
     checkAccess() {
       var identifiantUsed = localStorage.getItem('identifiantUsed');
 
@@ -250,6 +267,7 @@ export default {
       }
     },
 
+    
     getRelations() {
       var url = 'https://trankillprojets.fr/wal/wal.php?relation&identifiant=' + encodeURIComponent(this.identifiant);
       
@@ -266,7 +284,7 @@ export default {
         });
     },
     
-    // Fonction pour ouvrir une conversation
+    // Fonction pour ouvrir une conversation dans la liste de conversation
     getConversations() {
   let identifiant = localStorage.getItem('identifiantUsed');
   let url = 'https://trankillprojets.fr/wal/wal.php?messages&identifiant=' + encodeURIComponent(identifiant);
@@ -292,10 +310,16 @@ export default {
       }
     });
 },
-    selectConversation(conversation) {
-      this.selectedConversation = conversation;
-    },
 
+selectConversation(conversation) {
+  this.selectedConversation = conversation;
+  conversation.isNewMessage = false; // Réinitialiser la valeur d'isNewMessage pour la conversation sélectionnée
+},
+
+
+
+
+    // ajout d'une relation avec l'API
     async addRelation() {
       const { value: formValues } = await Swal.fire({
         title: 'Ajouter une nouvelle relation',
@@ -335,6 +359,7 @@ export default {
       });
   }
 },
+
 
 getRelationId() {
   if (this.selectedConversation) {
@@ -424,14 +449,20 @@ checkNewMessages() {
                   const messages = data.messages;
 
                   messages.forEach(message => {
-                    const conversation = this.conversations.find(conversation => conversation.relation === identifiantRelation);
+                    const conversationIndex = this.conversations.findIndex(conversation => conversation.relation === identifiantRelation);
 
-                    if (conversation) {
-                      conversation.messages.push({
-                        content: message.message,
-                        sender: 'Utilisateur 2', // Le message est reçu, donc le sender est l'autre utilisateur
-                        timestamp: new Date().toISOString()
-                      });
+                    if (conversationIndex !== -1) {
+                      const conversation = this.conversations[conversationIndex];
+                      const isNewMessage = !conversation.messages.find(msg => msg.content === message.message);
+                      
+                      if (isNewMessage) {
+                        conversation.messages.push({
+                          content: message.message,
+                          sender: 'Utilisateur 2',
+                          timestamp: new Date().toISOString()
+                        });
+                        conversation.isNewMessage = true;
+                      }
                     }
                   });
                 }
@@ -450,6 +481,10 @@ checkNewMessages() {
 
 
 
+
+
+
+// Mise à jour de la liste des conversation de l'utilisatreur
 async updateConversationList() {
   let identifiant = localStorage.getItem('identifiantUsed');
   let url = `https://trankillprojets.fr/wal/wal.php?relations&identifiant=${encodeURIComponent(identifiant)}`;
@@ -487,10 +522,6 @@ getMessageClass(message) {
   },
 
   },
-
-
-  // à utiliser si ne fonctionne pas updateConversationList()
-
   
 };
 </script>
@@ -706,12 +737,12 @@ input{
   background-color: #333333;
 }
 .conversation-footer button {
-  margin: 0 5px;
   color: white;
   border: none;
   background: none;
   font-size: 1.8em;
-  margin-right: 15%;
+  margin-left: 10%;
+  margin-right: 10%;
 }
 button{
   transition: all 0.5s;
