@@ -530,6 +530,69 @@ getMessageClass(message) {
 <style scoped lang="scss">
 @import '../assets/style.scss';
 
+//Pour les appareils desktop (grandes résolutions) :
+@media only screen and (min-width: 1200px) {
+.scrollable-list {
+  min-height: 80vh; 
+}
+
+.chat-container {
+  height: 100vh;
+}
+
+.chat-body {
+  height: 80vh;
+}
+.conversation-footer {
+  height: 10vh;
+}
+.conversation-header {
+  height: 10vh;
+}
+
+}
+
+//Pour les tablettes (résolutions moyennes) :
+@media only screen and (min-width: 768px) and (max-width: 1199px) {
+  .scrollable-list {
+  min-height: 80vh; 
+}
+
+.chat-container {
+  height: 100vh;
+}
+
+.chat-body {
+  height: 80vh;
+}
+.conversation-footer {
+  height: 10vh;
+}
+.conversation-header {
+  height: 10vh;
+}
+
+}
+
+//Pour les appareils mobiles (petites résolutions) :
+@media only screen and (max-width: 767px) {
+  .scrollable-list {
+  min-height: 70vh; 
+}
+
+
+.chat-body {
+  min-height: 75vh;
+}
+.conversation-footer {
+  height: 10vh;
+}
+.conversation-header {
+  height: 10vh;
+}
+
+}
+
 input{
   border-radius: 7px;
   outline: none; 
@@ -585,7 +648,6 @@ input{
 
 .scrollable-list {
   overflow-y: auto;
-  min-height: 70vh; 
 }
 .fa-solid {
   color: white;
@@ -594,7 +656,6 @@ input{
 
 .chat-container {
   width: 100%;
-  height: 100vh;
   display: flex;
   flex-direction: column;
 }
@@ -627,13 +688,7 @@ input{
   cursor: pointer;
 }
 
-.chat-body {
-  flex-grow: 1;
-  padding: 20px;
-  overflow-y: auto;
-  height: 70vh;
-  scroll-behavior: smooth;
-}
+
 .msg-preview{
   font-size: 1em;
   color: #333333 !important;
@@ -660,7 +715,6 @@ input{
   flex-grow: 1;
   padding: 20px;
   overflow-y: auto;
-  height: 80vh;
   scroll-behavior: smooth;
 }
 
@@ -727,13 +781,11 @@ input{
 .conversation-footer {
   display: flex;
   justify-content: center;
-  min-height: 10vh;
   background-color: $accentColor;
 }
 .conversation-header {
   display: flex;
   justify-content: center;
-  height: 10vh;
   background-color: #333333;
 }
 .conversation-footer button {
