@@ -7,7 +7,7 @@
         <h2 class="user-name"><span class="i-circle" id="userLetter">{{ firstLetterOfUser }}</span>  {{ selectedConversation.user }}</h2>
         <button class="action-button" @click="deleteRelation"><i class="fa-solid fa-trash circle-icon" style="color: white;"></i></button>
       </div>
-      <div class="chat-body" ref="chatBody">
+      <div class="chat-body" ref="chatBody" id="chat-body">
         <div v-for="(message, index) in selectedConversation.messages" :key="index">
           <div class="message-bubble" :class="{'sender-message': message.sender === 'Utilisateur 1', 'receiver-message': message.sender !== 'Utilisateur 1', 'from-user': message.sender === 'Utilisateur 1'}">
             {{ message.content }}
@@ -57,6 +57,7 @@
 </template>
 
 <script lang="js">
+import ToggleButton from './btn-mode.vue';
 export default {
   mounted() {
     this.checkAccess();
@@ -159,35 +160,67 @@ export default {
       this.message += emoji;
     },
 
-    // Fonction pour descendre dans la zone de chat, quand un message écrit
+    // Fonction pour descendre dans la zone de chat, quand un message est écrit
     scrollToBottom() {
-      const chatBody = this.$refs.chatBody;
-      chatBody.scrollTop = chatBody.scrollHeight;
-    },
+      // ajout d'un délais car le padding ne semble pas être pris en compte tout de suite
+      setTimeout(function() {
+    const div = document.getElementById('chat-body'); 
+    div.scrollTop = div.scrollHeight;
+  }, 500); 
+},
+
 
     settings(){
       
       Swal.fire({
-  title: '<strong>Options</u></strong>',
-  html:
-      '<h5>Choix du thème du système</h5>'+
-      '<input type="radio" id="lighttheme" name="contact" value="Clair " />'+
-      '<label id="lightthemes" for="lighttheme"> Clair </label>'+
-      '<canvas id="qrcode"></canvas>'+
-      //'<button @click="generateQRCode">Générer le code QR</button>'+
-      
-      '<input type="radio" @click="toggleMode id="darktheme" name="contact" value="Thème sombre " />'+
-      '<label id="darkthemes"for="darktheme"> Sombre </label>',
-  //showCloseButton: true,
+  title: '<strong>Options</strong>',
+  html: `
+    <h5>Choix du thème du système</h5>
+    <input type="radio" id="lighttheme" name="contact" value="Clair" />
+    <label id="lightthemes" for="lighttheme">Clair</label>
+    <input type="radio" id="darktheme" name="contact" value="Thème sombre" />
+    <label id="darkthemes" for="darktheme">Sombre</label>
+  `,
   showCancelButton: true,
   focusConfirm: false,
-  confirmButtonText:
-    '<i class="fa fa-thumbs-up"></i> Confirmer',
+  confirmButtonText: '<i class="fa fa-thumbs-up"></i> Confirmer',
   confirmButtonAriaLabel: 'Confirmer',
-  cancelButtonText:
-    '<i class="fa fa-thumbs-down"></i>Annuler',
-  cancelButtonAriaLabel: 'Annuler'
-})
+  cancelButtonText: '<i class="fa fa-thumbs-down"></i> Annuler',
+  cancelButtonAriaLabel: 'Annuler',
+  preConfirm: () => {
+    return new Promise((resolve) => {
+      Swal.showLoading(); // Afficher l'indicateur de chargement
+
+      setTimeout(() => {
+        const lightThemeRadio = document.getElementById('lighttheme');
+        const darkThemeRadio = document.getElementById('darktheme');
+        let selectedMode = '';
+
+        if (lightThemeRadio.checked) {
+          selectedMode = 'light';
+        } else if (darkThemeRadio.checked) {
+          selectedMode = 'dark';
+        }
+
+        resolve(selectedMode); // Renvoyer la valeur sélectionnée
+      }, 1000); // Attendre 1 seconde pour simuler une action asynchrone
+    });
+  }
+}).then((result) => {
+  if (result.isConfirmed) {
+    const selectedMode = result.value;
+
+    if (selectedMode === 'light') {
+      document.body.classList.remove('dark-mode');
+    } else if (selectedMode === 'dark') {
+      document.body.classList.add('dark-mode');
+    }
+
+    localStorage.setItem('theme', selectedMode);
+  }
+});
+
+
     },
 
     logOut() {
@@ -583,7 +616,8 @@ getMessageClass(message) {
 }
 
 .chat-body {
-  min-height: 70vh;
+  height: 70vh;
+  overflow-y: auto;
 }
 .conversation-footer {
   height: 15vh;

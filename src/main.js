@@ -2,12 +2,13 @@ import './assets/style.scss';
 import { themeMode } from './themeMode';
 import { createApp } from 'vue';
 import App from './App.vue';
+// import du bouton de switch de mode de couleur
 import ToggleButton from './components/btn-mode.vue';
 
 
 import { createRouter, createWebHashHistory } from 'vue-router';
 
-// Importez vos composants .vue
+// Url des pages vue
 import Home from './components/inscription.vue';
 import Login from './components/login.vue';
 import Chat from './components/ChatPage.vue';

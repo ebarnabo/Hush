@@ -31,8 +31,9 @@
       </div>
       <p class="text-center">Déjà inscrit <router-link to="/login"> Connexion </router-link></p>
     </form>
+    <ToggleButton />
   </div>
-  <ToggleButton />
+  
 </template>
 
 <script>

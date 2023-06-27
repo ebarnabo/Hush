@@ -30,11 +30,11 @@ const themeMode = {
     updateMode() {
       if (this.mode === 'dark') {
         // styles du mode sombre
-        document.documentElement.classList.add('sweetalert-dark-theme'); // Ajoute la classe CSS globale pour le thème sombre
+        document.documentElement.classList.add('sweetalert-dark-theme');
         document.body.classList.add('dark-mode');
       } else {
         // styles du mode clair
-        document.documentElement.classList.remove('sweetalert-dark-theme'); // Supprime la classe CSS globale pour le thème sombre
+        document.documentElement.classList.remove('sweetalert-dark-theme'); 
         document.body.classList.remove('dark-mode');
       }
     }
