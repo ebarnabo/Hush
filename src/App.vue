@@ -7,7 +7,6 @@
 
 <style scoped lang="scss">
   @import './assets/style.scss'
-
 </style>
 
 export default {

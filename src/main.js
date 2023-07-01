@@ -1,8 +1,14 @@
+// Import du fichier style scss globale du projet
 import './assets/style.scss';
+
+// Import du thème sombre
 import { themeMode } from './themeMode';
+
+// Création de l'application Vue
 import { createApp } from 'vue';
 import App from './App.vue';
-// import du bouton de switch de mode de couleur
+
+// Import du bouton de switch de mode de couleur, il poura être appeler partout avec la balise <ToggleButton />
 import ToggleButton from './components/btn-mode.vue';
 
 
@@ -21,6 +27,7 @@ const router = createRouter({
     { path: '/', component: Home },
     { path: '/login', component: Login },
     { path: '/chat', component: Chat },
+
     // Tous autres url non existant redirgera vers la page d'accueil
     { path: '/:pathMatch(.*)*', redirect: '/' }
   ],

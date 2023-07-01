@@ -14,24 +14,17 @@
           <input type="text" class="form-control" id="identifiant" placeholder="Entrez votre nom d'utilisateur" required>
           <label for="identifiant"><i class="fas fa-user"></i>   Identifiant</label>
           <div class="user d-flex align-items-center flex-wrap">
-  <div v-for="(user, index) in savedUsers" :key="index" class="d-flex align-items-center">
-    <button @click="login(user.identifiant)" class="btn btn-primary text-center mt-3 mx-1">
-      <i class="fa-solid fa-bolt-lightning fa-beat-fade" style="color: #f7ca26;"></i> {{user.pseudo}}
-    </button>
-    <button @click="deleteUser(index)" class="btn-danger btn btn-default btn-xs mt-3 mx-1">
-      <i class="fa-solid fa-trash"></i>
-    </button>
-  </div>
-</div>
-
-
+            <div v-for="(user, index) in savedUsers" :key="index" class="d-flex align-items-center">
+              <button @click="login(user.identifiant)" class="btn btn-primary text-center mt-3 mx-1">
+                <i class="fa-solid fa-bolt-lightning fa-beat-fade" style="color: #f7ca26;"></i> {{user.pseudo}}
+              </button>
+              <button @click="deleteUser(index)" class="btn-danger btn btn-default btn-xs mt-3 mx-1">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-      <!-- <p class="text-center">OU</p>
-      <div class="d-flex justify-content-center">
-        <button type="submit" class="btn btn-primary btn-block text-center mb-5 login-with-apple-btn" title="Connexion" onclick="Connexion()">Connexion avec Apple</button>
-        <button type="submit" class="btn btn-primary btn-block text-center mb-5 mx-3 login-with-google-btn" title="Connexion" onclick="Connexion()">Connexion avec Google</button>
-      </div> -->
       <div class="d-flex justify-content-center">
         <button type="submit" class="btn btn-primary btn-block text-center mb-5" title="Connexion">Connexion</button>
       </div>
@@ -43,29 +36,35 @@
 </template>
 
 <script>
-
 export default {
   data() {
     return {
       savedUsers: [],
     }
   },
+
   mounted() {
+    // Récupération des identifiants et pseudo sauvegardé en local storage
     this.getSavedUsers();
   },
 
-  // ouverture de mon application
+  // Suppression de l'identifiant stocké à l'ouverture de mon application
   created() {
     window.addEventListener('beforeunload', this.clearUsedIdentifiant);
     window.addEventListener('DOMContentLoaded', this.clearUsedIdentifiant);
   },
-  // fermeture de mon application
+  
+  // Suppression de l'identifiant stocké à fermeture de mon application
   beforeDestroy() {
     window.removeEventListener('beforeunload', this.clearUsedIdentifiant);
     window.removeEventListener('DOMContentLoaded', this.clearUsedIdentifiant);
   },
   methods: {
+
+    // Fonction de suppression d'identifiant/pseudo enregistré en local storage
     deleteUser(index) {
+
+    // Modal de confirmation de suppression d'1 compte enregistré
     Swal.fire({
       title: 'Êtes-vous sûr?',
       text: "Vous ne pourrez pas revenir en arrière!",
@@ -76,6 +75,7 @@ export default {
       confirmButtonText: 'Oui, supprimez-le!'
     }).then((result) => {
       if (result.isConfirmed) {
+
         // Supprime l'utilisateur de la liste
         this.savedUsers.splice(index, 1);
 
@@ -90,21 +90,26 @@ export default {
       }
     })
   },
+    // Fonction de suppression de l'id de l'utilisateur actif (en local storage)
     clearUsedIdentifiant() {
       localStorage.removeItem('identifiantUsed');
     },
+
+    // Fonction de récupération de l'id en local storage
     getSavedUsers() {
       const savedUsers = localStorage.getItem('savedUsers');
       if (savedUsers) {
         this.savedUsers = JSON.parse(savedUsers);
       }
     },
+
     connexion(event) {
       event.preventDefault();
       var identifiant = document.getElementById('identifiant').value;
       this.login(identifiant);
     },
-  // ouverture de mon application
+
+  // Script de connexion en utilisant l'identifiant saisie dans le formulaire ou les boutons lié au local storage
   login(identifiant) {
     var url = 'https://trankillprojets.fr/wal/wal.php?information&identifiant=' + encodeURIComponent(identifiant);
 
@@ -118,6 +123,7 @@ export default {
             localStorage.setItem('savedUsers', JSON.stringify(this.savedUsers));
           }
 
+          // Modal de confirmation de connexion
           Swal.fire({
             title: 'HUSH ⚡️ Fast Connect',
             text: "Voulez-vous vous connecter en tant que " + pseudo + " ?",
@@ -159,6 +165,8 @@ export default {
           })
 
         } else {
+
+          // Modale pour un utilisateur non trouvé
           Swal.fire({
             icon: 'error',
             title: 'Identifiant introuvable',
@@ -174,13 +182,7 @@ export default {
   },
   }
 }
-
-
-
-
 </script>
 
 <style scoped>
-/* Vos styles CSS ici */
-
 </style>

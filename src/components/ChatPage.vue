@@ -15,12 +15,14 @@
         </div>
       </div>
       
+      <!-- Listes des emojis ajoutable en conversation -->
       <div class="emoji-picker">
         <button class="emoji-button" @click="addEmoji('😃')">😃</button>
         <button class="emoji-button" @click="addEmoji('😍')">😍</button>
         <button class="emoji-button" @click="addEmoji('🔥')">🔥</button>
       </div>
 
+      <!-- Zone d'écriture et bouton d'envoi -->
       <div class="chat-footer">
         <input type="text" v-model="message" @keydown.enter="sendMessage" placeholder="Message..." />
         <button class="send-button" @click="sendMessage"><i class="fa-solid fa-arrow-up"></i></button>
@@ -29,35 +31,32 @@
 
     <!-- Autrement on affiche la liste des conversations lié au compte -->
     <div v-else>
-      <div class="conversation-header">
-        
+      <div class="conversation-header">        
       <img src="../assets/icon.png" alt="Image" class="header-image mx-auto d-block" id="header-list-img" >
       </div>
       <ul class="conversation-list scrollable-list">
-  <li v-for="(conversation, index) in conversations" :key="index" @click="selectConversation(conversation)">
-    <h4><span class="i-circle">{{ conversation.user.charAt(0).toUpperCase() }}</span> {{ conversation.user }}</h4>
-    <p class="msg-preview">
-      <i v-if="conversation.isNewMessage" id="notif" class="fa-solid fa-circle" style="color: #0061ff;"></i>
-      {{ previewMessage(conversation) }}
-    </p>
-    <span class="timestamp">{{ formatTimestamp(conversation) }}</span> <i class="fa-solid fa-angle-right"></i>
-  </li>
-</ul>
-
+        <li v-for="(conversation, index) in conversations" :key="index" @click="selectConversation(conversation)">
+          <h4><span class="i-circle">{{ conversation.user.charAt(0).toUpperCase() }}</span> {{ conversation.user }}</h4>
+          <p class="msg-preview">
+            <i v-if="conversation.isNewMessage" id="notif" class="fa-solid fa-circle" style="color: #0061ff;"></i>
+            {{ previewMessage(conversation) }}
+          </p>
+          <span class="timestamp">{{ formatTimestamp(conversation) }}</span> <i class="fa-solid fa-angle-right"></i>
+        </li>
+      </ul>
 
       <div class="conversation-footer d-flex justify-content-center">
-  <button @click="addRelation"><i class="fa-solid fa-user-plus" style="color: #ffffff;"></i></button>
-  <button @click="settings()" ><i class="fa-solid fa-gear" style="color: #ffffff;"></i></button>
-  <!-- <button @click="checkNewMessages()" ><i class="fa-solid fa-arrows-rotate fa-spin" style="color: #ffffff;"></i></button> -->
-  <button @click="logOut()" ><i class="fa-solid fa-right-from-bracket" style="color: #ffffff;"></i></button>
-</div>
+        <button @click="addRelation"><i class="fa-solid fa-user-plus" style="color: #ffffff;"></i></button>
+        <button @click="settings()" ><i class="fa-solid fa-gear" style="color: #ffffff;"></i></button>
+        <!-- <button @click="checkNewMessages()" ><i class="fa-solid fa-arrows-rotate fa-spin" style="color: #ffffff;"></i></button> -->
+        <button @click="logOut()" ><i class="fa-solid fa-right-from-bracket" style="color: #ffffff;"></i></button>
+      </div>
 
     </div>
   </div>
 </template>
 
 <script lang="js">
-import ToggleButton from './btn-mode.vue';
 export default {
   mounted() {
     this.checkAccess();
@@ -171,7 +170,7 @@ export default {
 
 
     settings(){
-      
+      // Modale de changement du thème dans le chat
       Swal.fire({
   title: '<strong>Options</strong>',
   html: `
@@ -189,7 +188,9 @@ export default {
   cancelButtonAriaLabel: 'Annuler',
   preConfirm: () => {
     return new Promise((resolve) => {
-      Swal.showLoading(); // Afficher l'indicateur de chargement
+
+      // Affiche un chargement pour que le changement se fasse
+
 
       setTimeout(() => {
         const lightThemeRadio = document.getElementById('lighttheme');
@@ -197,13 +198,17 @@ export default {
         let selectedMode = '';
 
         if (lightThemeRadio.checked) {
+          // Choix mode clair
           selectedMode = 'light';
         } else if (darkThemeRadio.checked) {
+          // Choix mode sombre
           selectedMode = 'dark';
         }
-
-        resolve(selectedMode); // Renvoyer la valeur sélectionnée
-      }, 1000); // Attendre 1 seconde pour simuler une action asynchrone
+        // Renvoi la valeur sélectionnée
+        resolve(selectedMode); 
+      }, 
+      // Transition de 300 ms
+      300);
     });
   }
 }).then((result) => {
@@ -211,11 +216,15 @@ export default {
     const selectedMode = result.value;
 
     if (selectedMode === 'light') {
+      // Passe en mode clair
       document.body.classList.remove('dark-mode');
-    } else if (selectedMode === 'dark') {
+    } 
+    
+    else if (selectedMode === 'dark') {
+      // Passe en mode sombre
       document.body.classList.add('dark-mode');
     }
-
+      // Stockage du mode selectionné en local storage
     localStorage.setItem('theme', selectedMode);
   }
 });
@@ -223,7 +232,10 @@ export default {
 
     },
 
+    // Fonction de déconnexion
     logOut() {
+
+    // Modale de confirmation de connexion
     Swal.fire({
       title: 'Êtes-vous sûr de vouloir vous déconnecter ?',
       showCancelButton: true,
@@ -238,13 +250,13 @@ export default {
         // Suppression de l'id du localStorage
         localStorage.removeItem('identifiantUsed');
 
-        // Rediriger vers la page de login
+        // Redirection vers la page de login
         this.$router.push('/login');
       }
     });
   },
 
-  // Affiche une preview du message reçu
+  // Affiche une preview du message reçu dans la liste de conversation
   previewMessage(conversation) {
   if (conversation.messages.length > 0) {
     let lastMessage = conversation.messages[conversation.messages.length - 1];
@@ -253,6 +265,7 @@ export default {
       //Mise à jour de la notif
       this.showNotif = true; // 
     }
+    // Taille de la preview limité à 49 char
     return lastMessage.content.length > 50 ? 
       lastMessage.content.substring(0, 48) + '...' : 
       lastMessage.content;
@@ -261,7 +274,7 @@ export default {
 },
 
 
-
+    // Fonction pour formater l'heure ou date du dernier message d'un conversation 
     formatTimestamp(conversation) {
     if (conversation.messages.length > 0) {
       let lastMessage = conversation.messages[conversation.messages.length - 1];
@@ -300,7 +313,7 @@ export default {
       }
     },
 
-    
+    // Fonction de récupération des relations de l'identifiant actif
     getRelations() {
       var url = 'https://trankillprojets.fr/wal/wal.php?relation&identifiant=' + encodeURIComponent(this.identifiant);
       
@@ -319,40 +332,40 @@ export default {
     
     // Fonction pour ouvrir une conversation dans la liste de conversation
     getConversations() {
-  let identifiant = localStorage.getItem('identifiantUsed');
-  let url = 'https://trankillprojets.fr/wal/wal.php?messages&identifiant=' + encodeURIComponent(identifiant);
-  
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      if (data.etat.reponse === 1) {
-        this.conversations = this.relations.map(relation => {
-          let relationMessages = data.messages.filter(message => message.pseudo === relation.pseudo);
-          return {
-            user: relation.pseudo,
-            messages: relationMessages.map(message => {
-              return {
-                sender: message.envoi === identifiant ? 'Utilisateur 1' : 'Utilisateur 2',
-                content: message.message
-              };
-            })
-          };
-        });
-      } else {
-        // Gestion d'erreur
-      }
-    });
+    let identifiant = localStorage.getItem('identifiantUsed');
+    let url = 'https://trankillprojets.fr/wal/wal.php?messages&identifiant=' + encodeURIComponent(identifiant);
+    
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data.etat.reponse === 1) {
+          this.conversations = this.relations.map(relation => {
+            let relationMessages = data.messages.filter(message => message.pseudo === relation.pseudo);
+            return {
+              user: relation.pseudo,
+              messages: relationMessages.map(message => {
+                return {
+                  sender: message.envoi === identifiant ? 'Utilisateur 1' : 'Utilisateur 2',
+                  content: message.message
+                };
+              })
+            };
+          });
+        } else {
+          // Gestion d'erreur
+        }
+      });
 },
 
+// Fonction quand on ouvre une conversation
 selectConversation(conversation) {
   this.selectedConversation = conversation;
-  conversation.isNewMessage = false; // Réinitialiser la valeur d'isNewMessage pour la conversation sélectionnée
+  // 
+  // Retire la notif si il y a un message qui était nouveau
+  conversation.isNewMessage = false; 
 },
 
-
-
-
-    // ajout d'une relation avec l'API
+    // Fonction d'ajout d'une relation avec l'API
     async addRelation() {
       const { value: formValues } = await Swal.fire({
         title: 'Ajouter une nouvelle relation',
@@ -365,35 +378,35 @@ selectConversation(conversation) {
           ]
         }
       });
-  if (formValues) {
-    let identifiant = localStorage.getItem('identifiantUsed');
-    let url = `https://trankillprojets.fr/wal/wal.php?lier&identifiant=${encodeURIComponent(identifiant)}&mail=${encodeURIComponent(formValues[0])}`;
+    if (formValues) {
+      let identifiant = localStorage.getItem('identifiantUsed');
+      let url = `https://trankillprojets.fr/wal/wal.php?lier&identifiant=${encodeURIComponent(identifiant)}&mail=${encodeURIComponent(formValues[0])}`;
 
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        console.log('Add relation response:', data);
-        if (data.etat.reponse === 1) {
-          // Mise à jour de la liste des conversations après l'ajout de la relation
-          this.updateConversationList();
-        } else {
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          console.log('Add relation response:', data);
+          if (data.etat.reponse === 1) {
+            // Mise à jour de la liste des conversations après l'ajout de la relation
+            this.updateConversationList();
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Une erreur est survenue lors de l\'ajout de la relation'
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Erreur:', error);
           Swal.fire({
             icon: 'error',
             title: 'Une erreur est survenue lors de l\'ajout de la relation'
           });
-        }
-      })
-      .catch(error => {
-        console.error('Erreur:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Une erreur est survenue lors de l\'ajout de la relation'
         });
-      });
-  }
+    }
 },
 
-
+// Renvoi l'id d'une relation
 getRelationId() {
   if (this.selectedConversation) {
     const conversation = this.conversations.find(
@@ -406,9 +419,11 @@ getRelationId() {
   return null;
 },
 
+// Suppression d'une relation
 deleteRelation() {
   const relationId = this.getRelationId();
   if (relationId) {
+    // Modal de confirmation
     Swal.fire({
       title: 'Confirmation',
       text: 'Voulez-vous vraiment supprimer cette relation ?',
@@ -460,18 +475,17 @@ deleteRelation() {
   }
 },
 
-
+// Vérification si il y a des nouveaux messages reçu venant de toutes les relations de l'identifiant actif
 checkNewMessages() {
   setInterval(() => {
     const identifiant = localStorage.getItem('identifiantUsed');
     const url = `https://trankillprojets.fr/wal/wal.php?relations&identifiant=${encodeURIComponent(identifiant)}`;
-
     fetch(url)
       .then(response => response.json())
       .then(data => {
         if (data.etat.reponse === 1) {
           const relations = data.relations;
-
+          // On vérifie pour toutes les relations
           relations.forEach(relation => {
             const identifiantRelation = relation.relation;
             const url = `https://trankillprojets.fr/wal/wal.php?lire&identifiant=${encodeURIComponent(identifiant)}&relation=${encodeURIComponent(identifiantRelation)}`;
@@ -513,10 +527,6 @@ checkNewMessages() {
 },
 
 
-
-
-
-
 // Mise à jour de la liste des conversation de l'utilisatreur
 async updateConversationList() {
   let identifiant = localStorage.getItem('identifiantUsed');
@@ -547,6 +557,7 @@ async updateConversationList() {
 },
 
 
+// Renvoi la classe pour un message | utilisé pour savoir si le message est reçu ou envoyé
 getMessageClass(message) {
     return {
       'sender-message': message.sender !== 'Utilisateur 1',
